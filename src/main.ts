@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
@@ -12,10 +11,8 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const port = Number(config.get('PORT') ?? 4000);
 
-  // Add /api prefix to all routes.
   app.setGlobalPrefix('api');
 
-  // Validate incoming API requests.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -24,10 +21,10 @@ async function bootstrap() {
     }),
   );
 
-  // Security headers.
+  // Dynamic ESM import for Helmet compatibility.
+  const { default: helmet } = await import('helmet');
   app.use(helmet());
 
-  // Swagger API documentation.
   const swaggerConfig = new DocumentBuilder()
     .setTitle('HR Backend API')
     .setDescription(
